@@ -27,38 +27,46 @@ import { filterImageFromURL, deleteLocalFiles, isValidURL } from './util/util.js
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-// @TODO1 IMPLEMENT A RESTFUL ENDPOINT
-// GET /filteredimage?image_url={{URL}}
-app.get("/filteredimage", async (req, res) => {
-  // Get the image_url from the query parameters
-  const image_url = req.query.image_url;
+  // @TODO1 IMPLEMENT A RESTFUL ENDPOINT
+  // GET /filteredimage?image_url={{URL}}
+  app.get("/filteredimage", async (req, res) => {
+    // Get the image_url from the query parameters
+    const image_url = req.query.image_url;
 
-  // Check if image_url is provided
-  if (!image_url) {
-    return res.status(400).send("Image URL is missing in the query parameters.");
-  }
+    // Check if image_url is provided
+    if (!image_url) {
+      return res.status(400).send("Image URL is missing in the query parameters.");
+    }
 
-  try {
-    // Call filterImageFromURL to process the image
-    const filteredImagePath = await filterImageFromURL(image_url);
-
-    // Send the resulting image as a response
-    res.sendFile(filteredImagePath, (err) => {
-      if (err) {
-        return res.status(500).send("Error sending the filtered image.");
+    try {
+      // Validate the image URL
+      if (!isValidURL(image_url)) {
+        throw new Error("Invalid URL");
       }
 
-      // Delete the local temporary file after sending it
-      deleteLocalFiles([filteredImagePath]);
-    });
-  } catch (error) {
-    // Handle errors, e.g., if the image URL is invalid or the image processing fails
-    // Access and log the precise error message
-    console.error("Error Object:", error);
-    res.status(500).send("cfx");
-  }
-});
+      // Call filterImageFromURL to process the image
+      const filteredImagePath = await filterImageFromURL(image_url);
 
+      // Send the resulting image as a response
+      res.status(200).sendFile(filteredImagePath, (err) => {
+        if (err) {
+          throw new Error("Error sending the filtered image");
+        }
+
+        // Delete the local temporary file after sending it
+        deleteLocalFiles([filteredImagePath]);
+      });
+    } catch (error) {
+      // Handle errors and return appropriate status codes
+      if (error.message === "Invalid URL") {
+        res.status(400).send("Invalid image URL.");
+      } else if (error.message === "Error sending the filtered image") {
+        res.status(500).send("Error sending the filtered image");
+      } else {
+        res.status(500).send("An unexpected error occurred.");
+      }
+    }
+  });
   //! END @TODO1
 
 
