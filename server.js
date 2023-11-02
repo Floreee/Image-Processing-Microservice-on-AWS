@@ -1,7 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import validUrl from 'valid-url';
-import { filterImageFromURL, deleteLocalFiles, isValidURL } from './util/util.js';
+import { filterImageFromURL, deleteLocalFiles } from './util/util.js';
 
 (async () => {
   // Init the Express application
@@ -41,7 +41,7 @@ import { filterImageFromURL, deleteLocalFiles, isValidURL } from './util/util.js
 
     try {
       // Validate the image URL
-      if (!ValidUrl.isWebUri(image_url)) {
+      if (!validUrl.isWebUri(image_url)) {
         return res.status(400).send("Invalid URL");
       }
 
