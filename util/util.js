@@ -12,7 +12,7 @@ import Jimp from "jimp";
 //    an absolute path to a filtered image locally saved file
  export async function filterImageFromURL(inputURL) {
   return new Promise(async (resolve, reject) => {
-    //try {
+    try {
     //  const photoBuffer = await axios.get(inputURL, {
     //    responseType: "arraybuffer",
     //  });
