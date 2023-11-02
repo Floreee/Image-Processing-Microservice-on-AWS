@@ -44,8 +44,3 @@ import Jimp from "jimp";
   }
 }
 
-export async function isValidURL(url) {
-  // Regular expression for a valid URL
-  const urlPattern = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/;
-  return urlPattern.test(url);
-}

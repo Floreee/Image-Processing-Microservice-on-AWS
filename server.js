@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import validUrl from 'valid-url';
 import { filterImageFromURL, deleteLocalFiles, isValidURL } from './util/util.js';
 
 (async () => {
@@ -40,8 +41,8 @@ import { filterImageFromURL, deleteLocalFiles, isValidURL } from './util/util.js
 
     try {
       // Validate the image URL
-      if (!isValidURL(image_url)) {
-        throw new Error("Invalid URL");
+      if (!ValidUrl.isWebUri(image_url)) {
+        return res.status(400).send("Invalid URL");
       }
 
       // Call filterImageFromURL to process the image
@@ -50,21 +51,15 @@ import { filterImageFromURL, deleteLocalFiles, isValidURL } from './util/util.js
       // Send the resulting image as a response
       res.status(200).sendFile(filteredImagePath, (err) => {
         if (err) {
-          throw new Error("Error sending the filtered image");
+          return res.status(500).send("Error sending the filtered image");
         }
 
         // Delete the local temporary file after sending it
         deleteLocalFiles([filteredImagePath]);
       });
     } catch (error) {
-      // Handle errors and return appropriate status codes
-      if (error.message === "Invalid URL") {
-        res.status(400).send("Invalid image URL.");
-      } else if (error.message === "Error sending the filtered image") {
-        res.status(500).send("Error sending the filtered image");
-      } else {
-        res.status(500).send("An unexpected error occurred.");
-      }
+      // Handle errors
+      res.status(500).send("An unexpected error occurred.");
     }
   });
   //! END @TODO1
